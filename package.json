@@ -10,9 +10,14 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.0.10",
+    "@vueup/vue-quill": "^1.1.0",
     "echarts": "^5.4.1",
     "element-plus": "^2.2.28",
+    "highlight.js": "^11.7.0",
+    "marked": "^4.2.12",
     "pinia": "^2.0.30",
+    "quill-emoji": "^0.2.0",
+    "quill-markdown-shortcuts": "^0.0.10",
     "vue": "^3.2.45",
     "vue-router": "4"
   },

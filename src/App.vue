@@ -2,9 +2,12 @@
 </script>
 
 <template>
-  <router-view></router-view>
+  <router-view id="router" />
 </template>
 
 <style scoped>
+#app {
+  background-color: #edeff2
+}
 
 </style>

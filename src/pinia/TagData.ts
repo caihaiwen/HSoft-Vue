@@ -5,7 +5,7 @@ export const useTagStore = defineStore("tags",{
         return{
             tags: [{
                 name: '首页',
-                content: '/index'
+                content: '/backer/index'
             }]
         }
     }

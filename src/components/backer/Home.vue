@@ -1,11 +1,9 @@
 <template>
-  <el-row gutter="20">
+  <el-row :gutter="20" style="height: 100vh;">
     <el-col :span="isCollapse?1:3">
-      <div class="logo" v-show="!isCollapse">HSoft</div>
-      <div :style="{width:isCollapse?'':'30%'}" style="text-align: center;margin: 20px 0 10px 0">
-      </div>
-      <el-menu mode="vertical" :default-active="defaultActivity" router :collapse="isCollapse">
-        <el-menu-item route="/index" index="/index">
+      <el-menu style="height: 100%" :collapse-transition="false" mode="vertical" :default-active="defaultActivity"
+               router :collapse="isCollapse">
+        <el-menu-item route="/backer/index" index="/backer/index">
           <el-icon>
             <PieChart/>
           </el-icon>
@@ -13,31 +11,84 @@
             <span>首页</span>
           </template>
         </el-menu-item>
-        <el-sub-menu>
+        <el-sub-menu index="2">
           <template #title>
             <el-icon>
-              <User/>
+              <InfoFilled />
             </el-icon>
-            <span>权限管理</span>
+            <span>基本信息</span>
           </template>
-          <el-menu-item-group>
-            <el-menu-item route="/test" index="/test">
-              管理员管理
+            <el-menu-item route="/backer/notice" index="/backer/notice">
+              <template #title>
+                <el-icon class="iconfont icon-gonggao" />
+                <span>公告管理</span>
+              </template>
             </el-menu-item>
-            <el-menu-item>
-              用户管理
-            </el-menu-item>
-          </el-menu-item-group>
-
         </el-sub-menu>
-        <el-menu-item></el-menu-item>
+        <el-sub-menu index="1">
+          <template #title>
+            <el-icon>
+              <User />
+            </el-icon>
+            <span>用户管理</span>
+          </template>
+            <el-menu-item route="/backer/user" index="/backer/user">
+              <el-icon>
+                <User/>
+              </el-icon>
+              <template #title>
+                <span>用户管理</span>
+              </template>
+            </el-menu-item>
+            <el-menu-item route="/backer/role" index="/backer/role">
+              <el-icon class="iconfont icon-role_icon" />
+              <template #title>
+                <span>角色管理</span>
+              </template>
+            </el-menu-item>
+        </el-sub-menu>
+        <el-sub-menu index="3">
+          <template #title>
+            <el-icon class="iconfont icon-type" />
+            <span>应用管理</span>
+          </template>
+            <el-menu-item route="/backer/application" index="/backer/application">
+              <el-icon>
+                <Grid/>
+              </el-icon>
+              <template #title>
+                <span>应用详情</span>
+              </template>
+            </el-menu-item>
+            <el-menu-item route="/backer/type" index="/backer/type">
+              <el-icon class="iconfont icon-icon_type" />
+              <template #title>
+                <span>分类管理</span>
+              </template>
+            </el-menu-item>
+        </el-sub-menu>
+        <el-menu-item route="/backer/comments" index="/backer/comments">
+          <el-icon class="iconfont icon-icon_type" />
+          <template #title>
+            <span>评论管理</span>
+          </template>
+        </el-menu-item>
+        <el-menu-item route="/backer/settings" index="/backer/settings">
+          <el-icon>
+            <Setting/>
+          </el-icon>
+          <template #title>
+            <span>系统设置</span>
+          </template>
+        </el-menu-item>
+
       </el-menu>
     </el-col>
-    <el-col :span="isCollapse?23:21" >
+    <el-col :span="isCollapse?23:21">
       <!--头部-->
       <div style="position:relative;;display: flex;align-items: center;justify-content: space-between;height: 60px">
         <div style="font-weight: 700" @click="isCollapse=!isCollapse">
-          <el-icon>
+          <el-icon style="cursor: pointer">
             <Expand v-if="isCollapse"/>
             <Fold v-if="!isCollapse"/>
           </el-icon>
@@ -45,7 +96,7 @@
         <div style="position: absolute;right: 20px">
           <el-dropdown>
             <el-avatar shape="circle" size="default"
-                       src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png"></el-avatar>
+                       :src="Avatar"></el-avatar>
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item>
@@ -60,10 +111,10 @@
         </div>
       </div>
       <el-tabs v-model="selectTag" @tab-remove="tabClose" @tab-click="tabClick" closable>
-        <el-tab-pane  v-for="tab in localTags" :key="tab.name" :label="tab.name" :name="tab.name">
+          <el-tab-pane v-for="tab in localTags" :key="tab.name" :label="tab.name" :name="tab.name">
+          </el-tab-pane>
 
-        </el-tab-pane>
-        <router-view />
+        <router-view id="childRouter"/>
       </el-tabs>
     </el-col>
   </el-row>
@@ -87,11 +138,12 @@
 </template>
 
 <script setup lang="ts">
+import Avatar from "@/assets/images/man.png"
 import {ref} from "vue"
 import type {FormInstance, TabsPaneContext} from "element-plus";
 //@ts-ignore
-import {Fold, Expand, PieChart, User} from "@element-plus/icons-vue"
-import {RouteLocationRaw, useRouter,useRoute} from "vue-router";
+import {Fold, Expand, PieChart, User, Grid, Crop, Setting,InfoFilled} from "@element-plus/icons-vue"
+import {RouteLocationRaw, useRouter, useRoute} from "vue-router";
 import {useTagStore} from "../../pinia/TagData"
 import {storeToRefs} from "pinia";
 
@@ -118,9 +170,9 @@ const modifyPasswordRules = (rule: any, value: any, callback: any) => {
   }
 }
 
-watch(route,(newValue) => {
+watch(route, (newValue) => {
   if (localTags.value.filter(s => s.name == newValue.name).length == 0) {
-    localTags.value.push({name:newValue.name,content:newValue.path})
+    localTags.value.push({name: newValue.name, content: newValue.path})
     selectTag.value = newValue.name;
   }
   defaultActivity.value = newValue.path;
@@ -150,32 +202,34 @@ const submitForm = (formEl: FormInstance | undefined) => {
 function tabClick(pane: TabsPaneContext, ev: Event) {
   const tag = localTags.value.filter(s => s.name == pane.paneName);
   selectTag.value = pane.paneName;
-  router.push(tag[0].content as RouteLocationRaw)
+  router.push(tag[0].content)
 }
-
 
 
 const localTags = ref([])
 onMounted(() => {
-
   //@ts-ignore
-  localTags.value.push(tags.value.filter(s => { return s.name == '首页'})[0])
-  selectTag.value = '首页';
+  localTags.value.push({
+    name: route.name,
+    content: route.path
+  })
+  selectTag.value = route.name;
+  defaultActivity.value = route.path;
 })
 
 
 function tabClose(name) {
   let i = 0;
   for (; i < localTags.value.length; i++) {
-    if ( localTags.value[i].name === name){
-      localTags.value.splice(i,1);
+    if (localTags.value[i].name === name) {
+      localTags.value.splice(i, 1);
       break;
     }
   }
-  if ( localTags.value.length === 0){
+  if (localTags.value.length === 0) {
     selectTag.value = '首页';
     router.push('/')
-  }else {
+  } else {
     selectTag.value == localTags.value[0].name;
     router.push(localTags.value[0].content);
   }
@@ -183,40 +237,14 @@ function tabClose(name) {
 </script>
 
 <style scoped>
-.width-tran {
-  transition: width 2s linear;
+
+
+#childRouter {
+  height: 90vh;
+  overflow: hidden;
 }
 
-.logo {
-  font-size: 30px;
-  text-align: center;
-  color: #88e;
-  text-shadow: 0 0 0.3em rgba(200, 200, 255, 0.3), 0.04em 0.04em 0 #112,
-  0.045em 0.045em 0 #88e, 0.09em 0.09em 0 #112, 0.095em 0.095em 0 #66c,
-  0.14em 0.14em 0 #112, 0.145em 0.145em 0 #44a;
-  animation: pulsea 300ms ease infinite alternate;
-}
-
-@keyframes pulsea {
-  0% {
-    text-shadow: 0 0 0.3em rgba(200, 200, 255, 0.3), 0.04em 0.04em 0 #112,
-    0.045em 0.045em 0 #88e, 0.09em 0.09em 0 #112, 0.095em 0.095em 0 #66c,
-    0.14em 0.14em 0 #112, 0.145em 0.145em 0 #aaf;
-  }
-  50% {
-    text-shadow: 0 0 0.3em rgba(200, 200, 255, 0.3), 0.04em 0.04em 0 #112,
-    0.045em 0.045em 0 #88e, 0.09em 0.09em 0 #112, 0.095em 0.095em 0 #aaf,
-    0.14em 0.14em 0 #112, 0.145em 0.145em 0 #44a;
-  }
-  75% {
-    text-shadow: 0 0 0.3em rgba(200, 200, 255, 0.3), 0.04em 0.04em 0 #112,
-    0.045em 0.045em 0 #aaf, 0.09em 0.09em 0 #112, 0.095em 0.095em 0 #66c,
-    0.14em 0.14em 0 #112, 0.145em 0.145em 0 #44a;
-  }
-  100% {
-    text-shadow: 0 0 0.3em rgba(200, 200, 255, 0.4), 0.04em 0.04em 0 #112,
-    0.045em 0.045em 0 #88e, 0.09em 0.09em 0 #112, 0.095em 0.095em 0 #66c,
-    0.14em 0.14em 0 #112, 0.145em 0.145em 0 #44a;
-  }
+#childRouter:hover {
+  overflow-y: auto;
 }
 </style>

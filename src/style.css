@@ -2,3 +2,12 @@ body {
   /*padding: 10px;*/
   font-family: "Microsoft YaHei";
 }
+.flex {
+  display: flex;
+}
+.justify-center{
+  justify-content: center;
+}
+.align-center {
+  align-items: center;
+}
